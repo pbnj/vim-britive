@@ -35,27 +35,42 @@ function! s:BritiveProfileCompletion(A,L,P) abort
       return filter(map(json_decode(system('britive listprofiles 2>/dev/null')), {_,v -> v.name}), 'v:val =~ a:A')
 endfunction
 
-function! s:BritiveOpen(profile) abort
-      echom 'britive checkout --console --silent ' . a:profile
-      if has('macunix')
-            execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t open'
-      elseif has('unix')
-            execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t xdg-open'
-      elseif has('win32')
-            echoerr "Command is unimplemented for Windows."
+
+function! s:BritiveCheckout(mode,profile) abort
+      if a:mode == 'console'
+            echom 'britive checkout --console --silent ' . a:profile
+            if has('macunix')
+                  execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t open'
+            elseif has('unix')
+                  execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t xdg-open'
+            elseif has('win32')
+                  echoerr 'Command is unimplemented for Windows. Run: britive checkout --console ' . a:profile
+            else
+                  echoerr 'System OS is unknown. Could not open Britive console URL. Run: britive checkout --console ' . a:profile
+            endif
+      elseif a:mode == 'env'
+            echom 'britive checkout --silent  --mode=displayenv ' . a:profile
+            execute '!britive checkout --silent  --mode=displayenv ' . a:profile
       else
-            echoerr "System OS is unknown. Could not open Britive console URL."
+            echom 'britive checkout --silent ' . a:profile
+            execute '!britive checkout --silent ' . a:profile
       endif
 endfunction
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout
-                  \ !britive checkout <args>
+                  \ call s:BritiveCheckout('',<q-args>)
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckoutEnv
-                  \ !britive checkout --mode=displayenv <args>
+                  \ call s:BritiveCheckout('env',<q-args>)
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole
-                  \ !britive checkout --console <args>
+                  \ call s:BritiveCheckout('console',<q-args>)
 
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsoleOpen
-                  \ call s:BritiveOpen(<q-args>)
+if exists(':FZF')
+      command! -nargs=* FZFBritiveCheckout
+                        \ call fzf#run(fzf#wrap({'source':'britive listprofiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',[''])},<bang>0))
+      command! -nargs=* FZFBritiveCheckoutEnv
+                        \ call fzf#run(fzf#wrap({'source':'britive listprofiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',['env'])},<bang>0))
+      command! -nargs=* FZFBritiveConsole
+                        \ call fzf#run(fzf#wrap({'source':'britive listprofiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',['console'])},<bang>0))
+endif
