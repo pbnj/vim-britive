@@ -36,6 +36,9 @@ function! s:BritiveProfileCompletion(A,L,P) abort
 endfunction
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout
+                  \ !britive checkout <args>
+
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckoutEnv
                   \ !britive checkout --mode=displayenv <args>
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole
