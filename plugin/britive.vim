@@ -35,6 +35,19 @@ function! s:BritiveProfileCompletion(A,L,P) abort
       return filter(map(json_decode(system('britive listprofiles 2>/dev/null')), {_,v -> v.name}), 'v:val =~ a:A')
 endfunction
 
+function! s:BritiveOpen(profile) abort
+      echom 'britive checkout --console --silent ' . a:profile
+      if has('macunix')
+            execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t open'
+      elseif has('unix')
+            execute '!britive checkout --console --silent ' . a:profile . ' 2>/dev/null | xargs -t xdg-open'
+      elseif has('win32')
+            echoerr "Command is unimplemented for Windows."
+      else
+            echoerr "System OS is unknown. Could not open Britive console URL."
+      endif
+endfunction
+
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout
                   \ !britive checkout <args>
 
@@ -43,3 +56,6 @@ command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckou
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole
                   \ !britive checkout --console <args>
+
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsoleOpen
+                  \ call s:BritiveOpen(<q-args>)

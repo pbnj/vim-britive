@@ -37,6 +37,8 @@ Plug 'https://github.com/pbnj/vim-britive'
 
 ## Usage
 
+### Basic
+
 Run Britive commands from vim:
 
 ```vim
@@ -50,11 +52,13 @@ For example, to check out a profile called `foo` and display credentials as
 environment variables:
 
 ```vim
-:Britive checkout foo --displaymode=env
+:Britive checkout foo
 ```
 
+### Checkout Programmatic Access
+
 Since checking out Britive Profiles for programmatic access (i.e. generating
-API keys) are very common operations, a dedicated command is provided:
+API keys) are very common operations, there is a convenient command for it:
 
 ```vim
 :BritiveCheckout <profile>
@@ -66,8 +70,24 @@ UI.
 Tab completion is supported on `:BritiveCheckout` command, which returns
 possible profile names.
 
-You may also check out Britive Profiles for console access (i.e. launching a
-browser tab):
+You may pass any `britive checkout` flags to this command. For example, if you
+would like to check out programmatic access and display the API
+keys/credentials in "environment variable" format:
+
+```vim
+:BritiveCheckout <profile> --displaymode=env
+```
+
+The "environment variable" use-case is fairly common that there is a convenient
+vim command for this:
+
+```vim
+:BritiveCheckoutEnv <profile>
+```
+
+### Checkout Console Access
+
+You may check out Britive Profiles for console access:
 
 ```vim
 :BritiveConsole <profile>
@@ -78,6 +98,12 @@ to checking out **Console Access** via the Britive web UI.
 
 Tab completion is supported on `:BritiveCheckout` command, which returns
 possible profile names.
+
+To automatically open Britive console URLs without manually copy/pasting:
+
+```vim
+:BritiveConsoleOpen <profile>
+```
 
 ## License
 
