@@ -105,6 +105,20 @@ To automatically open Britive console URLs without manually copy/pasting:
 :BritiveConsoleOpen <profile>
 ```
 
+### FZF Integration
+
+If [vim-fzf](https://github.com/junegunn/fzf.vim) plugin is installed, the
+following commands become available:
+
+```vim
+:FZFBritiveCheckout
+:FZFBritiveCheckoutEnv
+:FZFBritiveConsole
+```
+
+This allows users to fuzzy search Britive profiles and the selection will be
+passed to the respective Britive CLI commands.
+
 ## License
 
 MIT
