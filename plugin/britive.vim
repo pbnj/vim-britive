@@ -32,43 +32,42 @@ command! -nargs=* -complete=customlist,s:BritiveCompletion Britive
 " BritiveProfileCompletion provides profile name completion suggestions to
 " :BritiveCheckout and :BritiveConsole commands
 function! s:BritiveProfileCompletion(A,L,P) abort
-      return filter(map(json_decode(system('pybritive ls profiles --silent')), {_,v -> v.name}), 'v:val =~ a:A')
+      return filter(systemlist('pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' '), 'v:val =~ a:A')
 endfunction
 
 
 function! s:BritiveCheckout(mode,profile) abort
+      let l:profile = shellescape(a:profile)
+      if has('macunix')
+            let l:open = 'open'
+      elseif has('unix')
+            let l:open = 'xdg-open'
+      elseif has('win32')
+            let l:open = 'start'
+      endif
       if a:mode == 'console'
-            echom 'pybritive checkout --console --silent ' . a:profile
-            if has('macunix')
-                  execute 'term pybritive checkout --console --silent ' . a:profile . ' | xargs -t open'
-            elseif has('unix')
-                  execute 'term pybritive checkout --console --silent ' . a:profile . ' | xargs -t xdg-open'
-            elseif has('win32')
-                  " unsure if pipe to start works on windows. needs testing.
-                  execute 'term pybritive checkout --console --silent ' . a:profile . ' | start'
+            if has('unix')
+                  let l:cmd = 'pybritive checkout --console --silent ' .. l:profile .. ' | xargs -t ' .. l:open
             else
-                  echoerr 'System OS is unknown. Could not open Britive console URL. Run: pybritive checkout --console ' . a:profile
+                  let l:cmd = 'pybritive checkout --console --silent ' .. l:profile .. ' | ' .. l:open
             endif
+            echom l:cmd
+            execute '! ' .. l:cmd
       else
-            echom 'pybritive checkout ' . a:profile
-            execute 'term pybritive checkout --silent ' . a:profile
+            let l:cmd = 'pybritive checkout --silent ' .. l:profile
+            echom l:cmd
+            execute '! ' .. l:cmd
       endif
 endfunction
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout
                   \ call s:BritiveCheckout('',<q-args>)
-
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckoutEnv
-                  \ call s:BritiveCheckout('env',<q-args>)
-
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole
                   \ call s:BritiveCheckout('console',<q-args>)
 
 if exists(':FZF')
       command! -nargs=* FZFBritiveCheckout
-                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',[''])},<bang>0))
-      command! -nargs=* FZFBritiveCheckoutEnv
-                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',['env'])},<bang>0))
+                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' ','sink': function('<sid>BritiveCheckout',[''])},<bang>0))
       command! -nargs=* FZFBritiveConsole
-                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles | jq -rc .[].name','sink': function('<sid>BritiveCheckout',['console'])},<bang>0))
+                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' ','sink': function('<sid>BritiveCheckout',['console'])},<bang>0))
 endif
