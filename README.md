@@ -21,7 +21,7 @@
 access management platform.
 
 This is an unofficial vim plugin to provide a seamless integration with
-[`britive-cli`](https://www.npmjs.com/package/britive-cli).
+[`pybritive`](https://github.com/britive/python-cli).
 
 ## Install
 
@@ -33,7 +33,7 @@ Plug 'https://github.com/pbnj/vim-britive'
 
 ## Dependencies
 
-[`britive-cli`](https://www.npmjs.com/package/britive-cli)
+- [`pybritive`](https://github.com/britive/python-cli)
 
 ## Usage
 
