@@ -39,21 +39,20 @@ Plug 'https://github.com/pbnj/vim-britive'
 
 ### Basic
 
-Run Britive commands from vim:
+Run Britive commands from vim.
 
 ```vim
 :Britive <args...>
 ```
 
-Tab completion on `:Britive` command returns possible Britive sub-commands,
-like `checkin`, `checkout`, ...etc.
-
-For example, to check out a profile called `foo` and display credentials as
-environment variables:
+A basic example is checking out Britive Profiles:
 
 ```vim
 :Britive checkout <APPLICATION>/<ENVIRONMENT>/<PROFILE>
 ```
+
+Tab completion on `:Britive` command completes Britive sub-commands,
+like `checkin`, `checkout`, ...etc.
 
 ### Checkout Programmatic Access
 
@@ -67,8 +66,8 @@ API keys) are very common operations, there is a convenient command for it:
 This is equivalent to checking out **Programmatic Access** via the Britive web
 UI.
 
-Tab completion is supported on `:BritiveCheckout` command, which returns
-possible profile names.
+Tab completion is supported on `:BritiveCheckout` command, which completes
+profile names.
 
 You may pass any `britive checkout` flags to this command. For example, if you
 would like to check out programmatic access and display the API
@@ -89,10 +88,11 @@ You may check out console access for Britive Profiles:
 This will produce a URL for the configured Cloud Service Provider, equivalent
 to checking out **Console Access** via the Britive web UI.
 
-Tab completion is supported on `:BritiveConsole` command, which returns
+Tab completion is supported on `:BritiveConsole` command, which completes
 possible profile names.
 
-To automatically open Britive console URLs without manually copying/pasting, on macOS:
+To automatically open Britive console URLs without manually copying/pasting, on
+macOS:
 
 ```vim
 :BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE> | xargs open
