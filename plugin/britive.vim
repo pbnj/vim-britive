@@ -1,6 +1,6 @@
 " britive.vim - A Vim integration plugin for Britive CLI
 " Maintainer: Peter Benjamin
-" Version: 0.0.2
+" Version: 0.0.3
 
 if exists('g:loaded_britive')
       finish
@@ -10,64 +10,76 @@ let g:loaded_britive = 1
 " BritiveCompletion provides Britive sub-command completion suggestions to :Britive command
 function! s:BritiveCompletion(A,L,P) abort
       return filter([
-                        \ 'api'
-                        \ 'cache'
-                        \ 'checkin'
-                        \ 'checkout'
-                        \ 'clear'
-                        \ 'configure'
-                        \ 'login'
-                        \ 'logout'
-                        \ 'ls'
-                        \ 'request'
-                        \ 'secret'
-                        \ 'user'
+                        \ 'api',
+                        \ 'cache',
+                        \ 'checkin',
+                        \ 'checkout',
+                        \ 'clear',
+                        \ 'configure',
+                        \ 'login',
+                        \ 'logout',
+                        \ 'ls',
+                        \ 'request',
+                        \ 'secret',
+                        \ 'user',
                         \ ], 'v:val =~ a:A')
 endfunction
 
-" Britive command wraps `britive` cli in a terminal buffer
+" Britive command calls `pybritive` cli in a shell session using vim's
+" `:!{cmd}`
 command! -nargs=* -complete=customlist,s:BritiveCompletion Britive
-                  \ term pybritive <args>
+                  \ ! pybritive <args>
 
 " BritiveProfileCompletion provides profile name completion suggestions to
 " :BritiveCheckout and :BritiveConsole commands
 function! s:BritiveProfileCompletion(A,L,P) abort
-      return filter(systemlist('pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' '), 'v:val =~ a:A')
+      return filter(
+                        \ systemlist('pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' '),
+                        \ 'v:val =~ a:A')
 endfunction
 
+function! s:BritiveCheckout(profile) abort
+      let l:cmd = 'pybritive checkout ' .. shellescape(a:profile)
+      echom l:cmd
+      execute '! ' .. l:cmd
+endfunction
 
-function! s:BritiveCheckout(mode,profile) abort
-      let l:profile = shellescape(a:profile)
-      if has('macunix')
-            let l:open = 'open'
-      elseif has('unix')
-            let l:open = 'xdg-open'
-      elseif has('win32')
-            let l:open = 'start'
-      endif
-      if a:mode == 'console'
-            if has('unix')
-                  let l:cmd = 'pybritive checkout --console --silent ' .. l:profile .. ' | xargs -t ' .. l:open
-            else
-                  let l:cmd = 'pybritive checkout --console --silent ' .. l:profile .. ' | ' .. l:open
-            endif
-            echom l:cmd
-            execute '! ' .. l:cmd
-      else
-            let l:cmd = 'pybritive checkout --silent ' .. l:profile
-            echom l:cmd
-            execute '! ' .. l:cmd
-      endif
+function! s:BritiveConsoleOpen(profile) abort
+      let l:open_program = executable('open') ? 'xargs -t open' :
+                        \ executable('xdg-open') ? 'xargs -t xdg-open' :
+                        \ executable('start') ? 'start' :
+                        \ ''
+      let l:cmd = 'pybritive checkout --console ' .. shellescape(a:profile) .. ' | ' .. l:open_program
+      echom l:cmd
+      execute '! ' .. l:cmd | redraw!
 endfunction
 
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout
-                  \ call s:BritiveCheckout('',<q-args>)
+            \ call s:BritiveCheckout(<q-args>)
 command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole
-                  \ call s:BritiveCheckout('console',<q-args>)
+            \ call s:BritiveConsoleOpen(<q-args>)
 
 if exists(':FZF')
-      command! -nargs=* FZFBritiveCheckout
-                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' ','sink': function('<sid>BritiveCheckout',[''])},<bang>0))
-      command! -nargs=* FZFBritiveConsole
-                        \ call fzf#run(fzf#wrap({'source':'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' ','sink': function('<sid>BritiveCheckout',['console'])},<bang>0))
+      command! -nargs=* BritiveCheckoutFZF
+                        \ call fzf#run(
+                        \     fzf#wrap(
+                        \           {
+                        \                 'source'  : 'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' | grep -v "Application/Environment/Profile"',
+                        \                 'sink'    : function('<sid>BritiveCheckout'),
+                        \                 'options' : '--multi --bind="ctrl-r:reload(pybritive ls profiles --silent --format=csv | awk -F, ''{print \$1\"/\"\$2\"/\"\$3}'' | grep -v "Application/Environment/Profile")"',
+                        \           },
+                        \           <bang>0,
+                        \     )
+                        \ )
+      command! -nargs=* BritiveConsoleFZF
+                        \ call fzf#run(
+                        \     fzf#wrap(
+                        \           {
+                        \                 'source'  : 'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' | grep -v "Application/Environment/Profile"',
+                        \                 'sink'   : function('<sid>BritiveConsoleOpen'),
+                        \                 'options' : '--multi --bind="ctrl-r:reload(pybritive ls profiles --silent --format=csv | awk -F, ''{print \$1\"/\"\$2\"/\"\$3}'' | grep -v "Application/Environment/Profile")"',
+                        \           },
+                        \           <bang>0,
+                        \     )
+                        \ )
 endif

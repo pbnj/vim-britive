@@ -1,6 +1,6 @@
 # vim-britive
 
-> A Vim integration plugin for Britive
+> An unofficial Vim plugin for Britive
 
 ## Table of Contents
 
@@ -52,7 +52,7 @@ For example, to check out a profile called `foo` and display credentials as
 environment variables:
 
 ```vim
-:Britive checkout foo
+:Britive checkout <APPLICATION>/<ENVIRONMENT>/<PROFILE>
 ```
 
 ### Checkout Programmatic Access
@@ -61,7 +61,7 @@ Since checking out Britive Profiles for programmatic access (i.e. generating
 API keys) are very common operations, there is a convenient command for it:
 
 ```vim
-:BritiveCheckout <profile>
+:BritiveCheckout <APPLICATION>/<ENVIRONMENT>/<PROFILE>
 ```
 
 This is equivalent to checking out **Programmatic Access** via the Britive web
@@ -75,34 +75,33 @@ would like to check out programmatic access and display the API
 keys/credentials in "environment variable" format:
 
 ```vim
-:BritiveCheckout <profile> --displaymode=env
-```
-
-The "environment variable" use-case is fairly common that there is a convenient
-vim command for this:
-
-```vim
-:BritiveCheckoutEnv <profile>
+:BritiveCheckout <APPLICATION>/<ENVIRONMENT>/<PROFILE> --mode=env
 ```
 
 ### Checkout Console Access
 
-You may check out Britive Profiles for console access:
+You may check out console access for Britive Profiles:
 
 ```vim
-:BritiveConsole <profile>
+:BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE>
 ```
 
 This will produce a URL for the configured Cloud Service Provider, equivalent
 to checking out **Console Access** via the Britive web UI.
 
-Tab completion is supported on `:BritiveCheckout` command, which returns
+Tab completion is supported on `:BritiveConsole` command, which returns
 possible profile names.
 
-To automatically open Britive console URLs without manually copy/pasting:
+To automatically open Britive console URLs without manually copying/pasting, on macOS:
 
 ```vim
-:BritiveConsoleOpen <profile>
+:BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE> | xargs open
+```
+
+On Linux/Ubuntu:
+
+```vim
+:BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE> | xargs xdg-open
 ```
 
 ### FZF Integration
@@ -111,13 +110,21 @@ If [vim-fzf](https://github.com/junegunn/fzf.vim) plugin is installed, the
 following commands become available:
 
 ```vim
-:FZFBritiveCheckout
-:FZFBritiveCheckoutEnv
-:FZFBritiveConsole
+:BritiveCheckoutFZF
+:BritiveConsoleFZF
 ```
 
-This allows users to fuzzy search Britive profiles and the selection will be
-passed to the respective Britive CLI commands.
+This allows you to fuzzy search through your Britive Profiles and the selections
+will be passed to the respective Britive vim commands.
+
+Multiple selections are supported.
+
+`ctrl-r` fzf binding is configured to reload Britive Profiles in the Fuzzy
+Finder window.
+
+## TODO
+
+- [ ] Windows OS testing
 
 ## License
 
