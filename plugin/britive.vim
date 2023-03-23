@@ -41,15 +41,11 @@ endfunction
 function! s:BritiveCheckout(profile) abort
       let l:cmd = 'pybritive checkout ' .. shellescape(a:profile)
       echom l:cmd
-      execute '! ' .. l:cmd
+      execute '! ' .. l:cmd | redraw!
 endfunction
 
 function! s:BritiveConsoleOpen(profile) abort
-      let l:open_program = executable('open') ? 'xargs -t open' :
-                        \ executable('xdg-open') ? 'xargs -t xdg-open' :
-                        \ executable('start') ? 'start' :
-                        \ ''
-      let l:cmd = 'pybritive checkout --console ' .. shellescape(a:profile) .. ' | ' .. l:open_program
+      let l:cmd = 'pybritive checkout --console --mode=browser ' .. shellescape(a:profile)
       echom l:cmd
       execute '! ' .. l:cmd | redraw!
 endfunction
