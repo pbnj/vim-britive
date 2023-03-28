@@ -45,7 +45,7 @@ function! s:BritiveCheckout(profile) abort
 endfunction
 
 function! s:BritiveConsoleOpen(profile) abort
-      let l:cmd = 'pybritive checkout --console --mode=browser ' .. shellescape(a:profile)
+      let l:cmd = 'pybritive checkout --mode=browser ' .. shellescape(a:profile)
       echom l:cmd
       execute '! ' .. l:cmd | redraw!
 endfunction
