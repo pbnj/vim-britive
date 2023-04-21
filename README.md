@@ -54,7 +54,9 @@ A basic example is checking out Britive Profiles:
 Tab completion on `:Britive` command completes Britive sub-commands,
 like `checkin`, `checkout`, ...etc.
 
-### Checkout Programmatic Access
+### Profile Checkouts
+
+#### Checkout Programmatic Access
 
 Since checking out Britive Profiles for programmatic access (i.e. generating
 API keys) are very common operations, there is a convenient command for it:
@@ -77,7 +79,7 @@ keys/credentials in "environment variable" format:
 :BritiveCheckout <APPLICATION>/<ENVIRONMENT>/<PROFILE> --mode=env
 ```
 
-### Checkout Console Access
+#### Checkout Console Access
 
 You may check out console access for Britive Profiles:
 
@@ -104,7 +106,7 @@ On Linux/Ubuntu:
 :BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE> | xargs xdg-open
 ```
 
-### FZF Integration
+#### FZF Integration
 
 If [vim-fzf](https://github.com/junegunn/fzf.vim) plugin is installed, the
 following commands become available:
@@ -121,6 +123,28 @@ Multiple selections are supported.
 
 `ctrl-r` fzf binding is configured to reload Britive Profiles in the Fuzzy
 Finder window.
+
+### Britive API
+
+`pybritive` exposes the `api` subcommand to query Britive APIs beyond the
+available commands.
+
+For example, you may run an environment scan like so:
+
+```sh
+pybritive api scans.scan --application_id <app_id> --environment_id <env_id>
+```
+
+This plugin provides the vim command `:BritiveAPI` with tab-completion
+suggestions, which allows you to do the same in vim:
+
+```vim
+:BritiveAPI scans.scan --application_id <app_id> --environment_id <env_id>
+```
+
+The results will be displayed in a vim terminal buffer. This allows you to
+leverage the full capabilities and functionality of vim to query and interact
+with the data as you please.
 
 ## TODO
 
