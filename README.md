@@ -106,24 +106,6 @@ On Linux/Ubuntu:
 :BritiveConsole <APPLICATION>/<ENVIRONMENT>/<PROFILE> | xargs xdg-open
 ```
 
-#### FZF Integration
-
-If [vim-fzf](https://github.com/junegunn/fzf.vim) plugin is installed, the
-following commands become available:
-
-```vim
-:BritiveCheckoutFZF
-:BritiveConsoleFZF
-```
-
-This allows you to fuzzy search through your Britive Profiles and the selections
-will be passed to the respective Britive vim commands.
-
-Multiple selections are supported.
-
-`ctrl-r` fzf binding is configured to reload Britive Profiles in the Fuzzy
-Finder window.
-
 ### Britive API
 
 `pybritive` exposes the `api` subcommand to query Britive APIs beyond the

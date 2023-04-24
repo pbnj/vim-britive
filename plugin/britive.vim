@@ -28,7 +28,7 @@ endfunction
 
 " Britive command calls `pybritive` cli in a shell session using vim's
 " `:!{cmd}`
-command! -nargs=* -complete=customlist,s:BritiveCompletion Britive terminal pybritive <args>
+command! -nargs=* -complete=customlist,s:BritiveCompletion Britive ! pybritive <args>
 
 " BritiveAPICompletion function provides class names & methods as completion
 " suggestions to :BritiveAPI command
@@ -111,7 +111,7 @@ endfunction
 
 " BritiveAPI command wraps `pybritive api` cli sub-command to enable
 " user-friendly tab-completions
-command! -nargs=* -complete=customlist,BritiveAPICompletion BritiveAPI terminal pybritive api <args>
+command! -nargs=* -complete=customlist,BritiveAPICompletion BritiveAPI ! pybritive api <args>
 
 " BritiveProfileCompletion provides profile name completion suggestions to
 " :BritiveCheckout and :BritiveConsole commands
@@ -119,30 +119,5 @@ function! s:BritiveProfileCompletion(A,L,P) abort
       return filter(systemlist('pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' '), 'v:val =~ a:A')
 endfunction
 
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout terminal pybritive checkout <q-args>
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole terminal pybritive checkout --mode=browser <q-args>
-
-if exists(':FZF')
-      command! -nargs=* BritiveCheckoutFZF
-                        \ call fzf#run(
-                        \     fzf#wrap(
-                        \           {
-                        \                 'source'  : 'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' | grep -v "Application/Environment/Profile"',
-                        \                 'sink'    : function('<sid>BritiveCheckout'),
-                        \                 'options' : '--multi --bind="ctrl-r:reload(pybritive ls profiles --silent --format=csv | awk -F, ''{print \$1\"/\"\$2\"/\"\$3}'' | grep -v "Application/Environment/Profile")"',
-                        \           },
-                        \           <bang>0,
-                        \     )
-                        \ )
-      command! -nargs=* BritiveConsoleFZF
-                        \ call fzf#run(
-                        \     fzf#wrap(
-                        \           {
-                        \                 'source'  : 'pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' | grep -v "Application/Environment/Profile"',
-                        \                 'sink'   : function('<sid>BritiveConsoleOpen'),
-                        \                 'options' : '--multi --bind="ctrl-r:reload(pybritive ls profiles --silent --format=csv | awk -F, ''{print \$1\"/\"\$2\"/\"\$3}'' | grep -v "Application/Environment/Profile")"',
-                        \           },
-                        \           <bang>0,
-                        \     )
-                        \ )
-endif
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout ! pybritive checkout <q-args>
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole ! pybritive checkout --mode=browser <q-args>
