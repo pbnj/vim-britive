@@ -28,7 +28,7 @@ endfunction
 
 " Britive command calls `pybritive` cli in a shell session using vim's
 " `:!{cmd}`
-command! -nargs=* -complete=customlist,s:BritiveCompletion Britive ! pybritive <args>
+command! -nargs=* -complete=customlist,s:BritiveCompletion Britive silent ! pybritive <args>
 
 " BritiveAPICompletion function provides class names & methods as completion
 " suggestions to :BritiveAPI command
@@ -119,5 +119,19 @@ function! s:BritiveProfileCompletion(A,L,P) abort
       return filter(systemlist('pybritive ls profiles --silent --format=csv | awk -F, ''{print $1"/"$2"/"$3}'' '), 'v:val =~ a:A')
 endfunction
 
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout ! pybritive checkout <q-args>
-command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole ! pybritive checkout --mode=browser <q-args>
+function! s:BritiveCheckout(args) abort
+      if empty(a:args.profile)
+            let l:cmd = 'pybritive ls profiles --format=list | fzf-tmux --multi --reverse -p ''70%'' --prompt ''Britive Profiles> '' --bind=$''ctrl-r:reload(pybritive ls profiles --format=list)'' --query "${INITIAL_QUERY}" | xargs -t -L1 -I{} pybritive checkout --mode=browser "{}"'
+            echom trim(system(l:cmd))
+      else
+            let l:profile = shellescape(a:args.profile)
+            if a:args.mode == 'env'
+                  execute '! pybritive checkout ' .. l:profile
+            elseif a:args.mode == 'browser'
+                  execute '! pybritive checkout -m browser ' .. l:profile
+            endif
+      endif
+endfunction
+
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveCheckout call s:BritiveCheckout({'mode': 'env', 'profile': <q-args>})
+command! -nargs=* -complete=customlist,s:BritiveProfileCompletion BritiveConsole call s:BritiveCheckout({'mode': 'browser', 'profile': <q-args>})
